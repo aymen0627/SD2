@@ -61,12 +61,14 @@ except ValueError:
 #print(file_path) # For debugging purposes
 #im.show() # Display image before deblurring
 
+# Absolute folder path
+folder_path = 'C:/Users/luigi/Desktop/LPR_Pipeline'
 
 # ***** Preprocessing: Deblurring *****
 st = time.time()
 string_to_edit = 'python ./basicsr/demo.py -opt options/test/REDS/NAFNet-width64.yml --input_path image_path --output_path ./Output_Images/TEST_img.jpg'
 command = string_to_edit.replace('image_path', file_path)
-results = subprocess.run(command, cwd='C:/Users/luigi/Desktop/LPR_Pipeline', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+results = subprocess.run(command, cwd=folder_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 #output = results.stdout.decode("utf-8") # For debugging purposes
 #print(output)
 
@@ -79,10 +81,10 @@ print('Execution time:', elapsed_time, 'seconds')
 
 # ***** OpenALPR *****
 st = time.time()
-
+alpr_path = folder_path + "/alpr.exe"
 string_to_edit = 'C:/Users/luigi/Desktop/LPR_Pipeline/alpr.exe -c us deblurred_image_path --clock'
 command = string_to_edit.replace('deblurred_image_path', "./Output_Images/TEST_img.jpg")
-results = subprocess.run(command, cwd='C:/Users/luigi/Desktop/LPR_Pipeline', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+results = subprocess.run(command, cwd=folder_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 output = results.stdout.decode("utf-8")
 
 # get the end time
