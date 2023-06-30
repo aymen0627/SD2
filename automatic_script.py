@@ -12,11 +12,15 @@ import sys
 # ******************************************
 # Enter folder's location FIRST
 # Example: cd  C:\Users\luigi\Desktop\LPR_Pipeline
-# Change cwd and all absolute paths to the location
+# Change folder path to the same location
 #
 # If running for this first time, run the following commands before:
 # 1) pip install -r requirements.txt
 # 2) python setup.py develop --no_cuda_ext
+
+
+# Absolute folder path (Change accordingly)
+folder_path = 'C:/Users/luigi/Desktop/LPR_Pipeline'
 
 # Argument Parsing
 n = len(sys.argv)
@@ -39,8 +43,7 @@ print("\nArguments passed: ", sys.argv[1])
 # Argument testing purposes only
 #sys.exit()
 
-
-# Semi-automatic Pipeline
+# Automatic Pipeline
 # User selects image from folder
 root = tk.Tk()
 root.withdraw()
@@ -61,9 +64,6 @@ except ValueError:
 #print(file_path) # For debugging purposes
 #im.show() # Display image before deblurring
 
-# Absolute folder path
-folder_path = 'C:/Users/luigi/Desktop/LPR_Pipeline'
-
 # ***** Preprocessing: Deblurring *****
 st = time.time()
 string_to_edit = 'python ./basicsr/demo.py -opt options/test/REDS/NAFNet-width64.yml --input_path image_path --output_path ./Output_Images/TEST_img.jpg'
@@ -82,7 +82,7 @@ print('Execution time:', elapsed_time, 'seconds')
 # ***** OpenALPR *****
 st = time.time()
 alpr_path = folder_path + "/alpr.exe"
-string_to_edit = 'C:/Users/luigi/Desktop/LPR_Pipeline/alpr.exe -c us deblurred_image_path --clock'
+string_to_edit = f'{alpr_path} -c us deblurred_image_path --clock'
 command = string_to_edit.replace('deblurred_image_path', "./Output_Images/TEST_img.jpg")
 results = subprocess.run(command, cwd=folder_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 output = results.stdout.decode("utf-8")
