@@ -12,7 +12,7 @@ import sys
 # ******************************************
 # Enter folder's location FIRST
 # Example: cd  C:\Users\luigi\Desktop\LPR_Pipeline
-# Change it cwd and all absolute paths to the location
+# Change cwd and all absolute paths to the location
 #
 # If running for this first time, run the following commands before:
 # 1) pip install -r requirements.txt
