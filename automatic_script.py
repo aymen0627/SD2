@@ -5,6 +5,7 @@ from PIL import Image
 from datetime import datetime
 import time
 import sys
+import match_and_log as log
 
 
 # ******************************************
@@ -37,11 +38,7 @@ if(n > 2):
  
 # Arguments passed
 print("\nName of Python script:", sys.argv[0])
- 
 print("\nArguments passed: ", sys.argv[1])
-
-# Argument testing purposes only
-#sys.exit()
 
 # Automatic Pipeline
 # User selects image from folder
@@ -64,7 +61,13 @@ except ValueError:
 #print(file_path) # For debugging purposes
 #im.show() # Display image before deblurring
 
+# Saves current date and time
+current_datetime = datetime.now()
+formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
+
+# *************************************
 # ***** Preprocessing: Deblurring *****
+# *************************************
 st = time.time()
 string_to_edit = 'python ./basicsr/demo.py -opt options/test/REDS/NAFNet-width64.yml --input_path image_path --output_path ./Output_Images/TEST_img.jpg'
 command = string_to_edit.replace('image_path', file_path)
@@ -72,46 +75,48 @@ results = subprocess.run(command, cwd=folder_path, stdout=subprocess.PIPE, stder
 #output = results.stdout.decode("utf-8") # For debugging purposes
 #print(output)
 
-# get the end time
-et = time.time()
-# get the execution time
-elapsed_time = et - st
-print('Execution time:', elapsed_time, 'seconds')
 
-
-# ***** OpenALPR *****
-st = time.time()
+# ********************************
+# *********** OpenALPR ***********
+# ********************************
 alpr_path = folder_path + "/alpr.exe"
 string_to_edit = f'{alpr_path} -c us deblurred_image_path --clock'
 command = string_to_edit.replace('deblurred_image_path', "./Output_Images/TEST_img.jpg")
 results = subprocess.run(command, cwd=folder_path, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 output = results.stdout.decode("utf-8")
-
-# get the end time
-et = time.time()
-# get the execution time
-elapsed_time = et - st
-print('Execution time:', elapsed_time, 'seconds')
-
 lines = output.splitlines()
 
 # Gets most confident license plate identified
+identified = False
 first_result = ""
 for line in lines:
     if line.startswith(' '):
         first_result = line.split()[1]
+        identified = True
         break
     else:
         # No camera ID or Zone specification yet
         first_result = "No plate identified (Sensor Triggered)"
 
-
-current_datetime = datetime.now()
-formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
-
-display_string = first_result + " @ " + formatted_datetime + "\n"
+display_string = first_result + " " + formatted_datetime + "\n"
 print("\n\n\nIdentified License plate: ", display_string)
 
-log_file = open("log.txt", "a")
-log_file.write(display_string)
-log_file.close()
+zone = 1 # DELETE LATER
+
+if(identified):
+    detection_info = {
+        "plate": first_result,
+        "zone": zone,
+        "lastSeen": formatted_datetime
+    }   
+    log.match_and_log(detection_info)
+else:
+    log_file = open("log.txt", "a")
+    log_file.write(display_string)
+    log_file.close()
+
+
+# get the end and execution time
+et = time.time()
+elapsed_time = et - st
+print('Execution time:', elapsed_time, 'seconds')
